@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>필사즉생 - 파일 업로드 & 분석</title>
+    <style>
+        /* 기본 스타일 */
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f3ef;
+        }
+
+        /* 헤더 스타일 */
+        .header {
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .search-bar input[type="text"] {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        /* 메인 컨테이너 스타일 */
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        /* 파일 입력 및 버튼 스타일 */
+        input[type="file"] {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px 20px;
+            background-color: #e3c18f;
+            color: #333;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #c9a870;
+        }
+
+        /* 결과 영역 스타일 */
+        .result-container {
+            display: none;
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .result-container h2 {
+            font-size: 20px;
+            color: #34495e;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h3 {
+            font-size: 16px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .section p, .section pre {
+            font-size: 14px;
+            color: #2c3e50;
+            background-color: #eef2f3;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        pre {
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        /* 하단 링크 스타일 */
+        .footer {
+            text-align: center;
+            font-size: 14px;
+            color: #888;
+            margin-top: 30px;
+        }
+
+        .footer a {
+            text-decoration: none;
+            color: #888;
+            margin: 0 5px;
+        }
+
+        .logo a {
+    text-decoration: none; /* 링크 밑줄 제거 */
+    color: inherit; /* 텍스트 색상을 부모 요소에 맞춤 */
+    display: flex; /* 이미지와 텍스트를 정렬 */
+    align-items: center; /* 수직 가운데 정렬 */
+}
+.logo img {
+    margin-right: 8px; /* 이미지와 텍스트 사이의 간격 */
+}
+
+    </style>
+</head>
+<body>
+
+    <!-- 헤더 -->
+    <div class="header">
+        <div class="logo">
+            <a href="/">
+                <img src="/static/logo.png" alt="Logo">
+                필사즉생
+            </a>
+        </div>
+        
+        <div class="nav">
+            <a href="/">홈</a>
+            <a href="/static_analysis.html">정적 분석</a>
+            <a href="/dynamic_analysis">동적 분석</a>
+            <a href="/api_documentation">API</a>
+            <a href="/about">ABOUT</a>
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search">
+        </div>
+    </div>
+
+    <!-- 메인 컨테이너 -->
+    <div class="container">
+        <h1>종합 분석</h1>
+        <p>드래그 & 드롭하여 파일을 업로드하세요!</p>
+        
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" id="fileInput" name="file" required>
+            <button type="button" onclick="submitForm()">Upload & Analyze</button>
+        </form>
+
+        <!-- 분석 결과가 표시될 영역 -->
+        <div id="resultContainer" class="result-container">
+            <h2>Analysis Result</h2>
+
+            <div class="section">
+                <h3>Full JSON Result</h3>
+                <pre id="fullJsonResult"></pre>
+            </div>
+
+            <div class="section">
+                <h3>Dynamic Analysis</h3>
+                <p id="dynamicMessage"></p>
+            </div>
+
+            <div class="section">
+                <h3>Emulator Detection</h3>
+                <p id="isEmulator"></p>
+            </div>
+
+            <div class="section">
+                <h3>Static Analysis</h3>
+                <p id="fileHash"></p>
+                <p id="fileSize"></p>
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- 하단 링크 -->
+    <div class="footer">
+        RECENT SCANS | DYNAMIC ANALYZER | API | DONATE | DOCS | ABOUT<br>
+        © 필사즉생 분석 웹사이트
+    </div>
+
+    <script>
+        function submitForm() {
+            const formData = new FormData();
+            const fileInput = document.getElementById("fileInput");
+
+            if (fileInput.files.length === 0) {
+                alert("Please select a file.");
+                return;
+            }
+
+            formData.append("file", fileInput.files[0]);
+
+            fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultContainer = document.getElementById("resultContainer");
+                resultContainer.style.display = "block";
+                document.getElementById("fullJsonResult").textContent = JSON.stringify(data, null, 2);
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
+    
+</body>
+</html>
